@@ -5760,6 +5760,13 @@ impl TermWindow {
         use_default_app: bool,
         configured_editor: Option<&str>,
     ) -> anyhow::Result<()> {
+        #[cfg(target_os = "macos")]
+        if crate::macos::file_link::should_open_in_finder(&target.path)
+            && Self::try_open_path_with_default_app(&target.path)?
+        {
+            return Ok(());
+        }
+
         let mut configured_editor_error = None;
         if let Some(editor) = configured_editor {
             match Self::try_open_configured_editor(editor, target) {

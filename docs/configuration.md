@@ -187,7 +187,7 @@ config.file_link_editor = "zed"
 -- config.file_link_editor = "cursor --goto"
 ```
 
-This setting takes priority over Kaku's automatic VS Code detection. When it is unset, Kaku keeps the existing VS Code and `$VISUAL` / `$EDITOR` fallback behavior.
+This setting takes priority over Kaku's automatic VS Code detection. When it is unset, Kaku keeps the existing VS Code and `$VISUAL` / `$EDITOR` fallback behavior. Directory links always open in Finder, whether or not this setting is set.
 
 **Copy on select**
 

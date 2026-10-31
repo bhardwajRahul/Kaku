@@ -23,6 +23,13 @@ pub fn should_open_with_default_app(path: &Path) -> bool {
     has_non_text_extension(path)
 }
 
+/// Returns true when Cmd+Click should hand the path to Finder before any
+/// editor, including `file_link_editor` and VS Code. A folder opened as an
+/// editor workspace is rarely what a click on a directory path means.
+pub fn should_open_in_finder(path: &Path) -> bool {
+    path.is_dir()
+}
+
 #[cfg(target_os = "macos")]
 pub fn open_with_default_app(path: &Path) -> anyhow::Result<bool> {
     let status = std::process::Command::new("/usr/bin/open")
@@ -33,8 +40,18 @@ pub fn open_with_default_app(path: &Path) -> anyhow::Result<bool> {
 
 #[cfg(test)]
 mod tests {
-    use super::{has_non_text_extension, NON_TEXT_FILE_EXTENSIONS};
+    use super::{has_non_text_extension, should_open_in_finder, NON_TEXT_FILE_EXTENSIONS};
     use std::path::Path;
+
+    #[test]
+    fn directories_open_in_finder_and_files_do_not() {
+        let dir = tempfile::tempdir().unwrap();
+        assert!(should_open_in_finder(dir.path()));
+        let file = dir.path().join("main.rs");
+        std::fs::write(&file, "fn main() {}").unwrap();
+        assert!(!should_open_in_finder(&file));
+        assert!(!should_open_in_finder(&dir.path().join("missing")));
+    }
 
     #[test]
     fn non_text_extension_whitelist_covers_issue_regression() {
